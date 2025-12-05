@@ -23,6 +23,7 @@ import {
   PATH_FULL_INFERRED,
   PATH_GRID_INFERRED,
   PATH_SIGN_IN,
+  pathForAlbum,
   pathForCamera,
   pathForFilm,
   pathForFocalLength,
@@ -93,6 +94,8 @@ import { formatDistanceToNow } from 'date-fns';
 import IconCheck from '@/components/icons/IconCheck';
 import { getSortStateFromPath } from '@/photo/sort/path';
 import IconSort from '@/components/icons/IconSort';
+import { useSelectPhotosState } from '@/admin/select/SelectPhotosState';
+import IconAlbum from '@/components/icons/IconAlbum';
 
 const DIALOG_TITLE = 'Global Command-K Menu';
 const DIALOG_DESCRIPTION = 'For searching photos, views, and settings';
@@ -139,6 +142,7 @@ export default function CommandKClient({
   years: _years,
   cameras,
   lenses,
+  albums,
   tags: _tags,
   recipes,
   films,
@@ -161,8 +165,6 @@ export default function CommandKClient({
     uploadsCount,
     tagsCount,
     recipesCount,
-    selectedPhotoIds,
-    setSelectedPhotoIds,
     insightsIndicatorStatus,
     isGridHighDensity,
     areZoomControlsShown,
@@ -181,6 +183,12 @@ export default function CommandKClient({
     setShouldDebugInsights,
     setShouldDebugRecipeOverlays,
   } = useAppState();
+
+  const {
+    isSelectingPhotos,
+    startSelectingPhotos,
+    stopSelectingPhotos,
+  } = useSelectPhotosState();
 
   const {
     doesPathOfferSort,
@@ -351,107 +359,117 @@ export default function CommandKClient({
     CATEGORY_VISIBILITY
       .map(category => {
         switch (category) {
-        case 'recents': return {
-          heading: appText.category.recentPlural,
-          accessory: <IconRecents size={15} />,
-          items: recentsStatus ? [{
-            label: recentsStatus.subhead,
-            annotation: formatCount(recentsStatus.count),
-            annotationAria: formatCountDescriptive(recentsStatus.count),
-            path: PREFIX_RECENTS,
-          }] : [],
-        };
-        case 'years': return {
-          heading: appText.category.yearPlural,
-          accessory: <IconYear size={14} />,
-          items: years.map(({ year, count }) => ({
-            label: year,
-            annotation: formatCount(count),
-            annotationAria: formatCountDescriptive(count),
-            path: pathForYear(year),
-          })),
-        };
-        case 'cameras': return {
-          heading: appText.category.cameraPlural,
-          accessory: <IconCamera size={14} />,
-          items: cameras.map(({ camera, count }) => ({
-            label: formatCameraText(camera),
-            annotation: formatCount(count),
-            annotationAria: formatCountDescriptive(count),
-            path: pathForCamera(camera),
-          })),
-        };
-        case 'lenses': return {
-          heading: appText.category.lensPlural,
-          accessory: <IconLens size={14} className="translate-y-[0.5px]" />,
-          items: lenses.map(({ lens, count }) => ({
-            label: formatLensText(lens, 'medium'),
-            explicitKey: formatLensText(lens, 'long'),
-            annotation: formatCount(count),
-            annotationAria: formatCountDescriptive(count),
-            path: pathForLens(lens),
-          })),
-        };
-        case 'tags': return {
-          heading: appText.category.tagPlural,
-          accessory: <IconTag
-            size={13}
-            className="translate-x-[1px] translate-y-[0.75px]"
-          />,
-          items: tags.map(({ tag, count }) => ({
-            explicitKey: formatTag(tag),
-            label: <span className="flex items-center gap-[7px]">
-              {formatTag(tag)}
-              {isTagFavs(tag) &&
-                <IconFavs
-                  size={13}
-                  className="translate-y-[-0.5px]"
-                  highlight
-                />}
-              {isTagPrivate(tag) &&
-                <IconLock
-                  size={12}
-                  className="text-dim translate-y-[-0.5px]"
-                />}
-            </span>,
-            annotation: formatCount(count),
-            annotationAria: formatCountDescriptive(count),
-            path: pathForTag(tag),
-          })),
-        };
-        case 'recipes': return {
-          heading: appText.category.recipePlural,
-          accessory: <IconRecipe
-            size={15}
-            className="translate-x-[-1px]"
-          />,
-          items: recipes.map(({ recipe, count }) => ({
-            label: formatRecipe(recipe),
-            annotation: formatCount(count),
-            annotationAria: formatCountDescriptive(count),
-            path: pathForRecipe(recipe),
-          })),
-        };
-        case 'films': return {
-          heading: appText.category.filmPlural,
-          accessory: <IconFilm size={14} />,
-          items: films.map(({ film, count }) => ({
-            label: labelForFilm(film).medium,
-            annotation: formatCount(count),
-            annotationAria: formatCountDescriptive(count),
-            path: pathForFilm(film),
-          })),
-        };
-        case 'focal-lengths': return {
-          heading: appText.category.focalLengthPlural,
-          accessory: <IconFocalLength className="text-[14px]" />,
-          items: focalLengths.map(({ focal, count }) => ({
-            label: formatFocalLength(focal),
-            annotation: formatCount(count),
-            annotationAria: formatCountDescriptive(count),
-            path: pathForFocalLength(focal),
-          })),
-        };
+          case 'recents': return {
+            heading: appText.category.recentPlural,
+            accessory: <IconRecents size={15} />,
+            items: recentsStatus ? [{
+              label: recentsStatus.subhead,
+              annotation: formatCount(recentsStatus.count),
+              annotationAria: formatCountDescriptive(recentsStatus.count),
+              path: PREFIX_RECENTS,
+            }] : [],
+          };
+          case 'years': return {
+            heading: appText.category.yearPlural,
+            accessory: <IconYear size={14} />,
+            items: years.map(({ year, count }) => ({
+              label: year,
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForYear(year),
+            })),
+          };
+          case 'cameras': return {
+            heading: appText.category.cameraPlural,
+            accessory: <IconCamera size={14} />,
+            items: cameras.map(({ camera, count }) => ({
+              label: formatCameraText(camera),
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForCamera(camera),
+            })),
+          };
+          case 'lenses': return {
+            heading: appText.category.lensPlural,
+            accessory: <IconLens size={14} className="translate-y-[0.5px]" />,
+            items: lenses.map(({ lens, count }) => ({
+              label: formatLensText(lens, 'medium'),
+              explicitKey: formatLensText(lens, 'long'),
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForLens(lens),
+            })),
+          };
+          case 'albums': return {
+            heading: appText.category.albumPlural,
+            accessory: <IconAlbum size={14} />,
+            items: albums.map(({ album, count }) => ({
+              label: album.title,
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForAlbum(album),
+            })),
+          };
+          case 'tags': return {
+            heading: appText.category.tagPlural,
+            accessory: <IconTag
+              size={13}
+              className="translate-x-[1px] translate-y-[0.75px]"
+            />,
+            items: tags.map(({ tag, count }) => ({
+              explicitKey: formatTag(tag),
+              label: <span className="flex items-center gap-[7px]">
+                {formatTag(tag)}
+                {isTagFavs(tag) &&
+                  <IconFavs
+                    size={13}
+                    className="translate-y-[-0.5px]"
+                    highlight
+                  />}
+                {isTagPrivate(tag) &&
+                  <IconLock
+                    size={12}
+                    className="text-dim translate-y-[-0.5px]"
+                  />}
+              </span>,
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForTag(tag),
+            })),
+          };
+          case 'recipes': return {
+            heading: appText.category.recipePlural,
+            accessory: <IconRecipe
+              size={15}
+              className="translate-x-[-1px]"
+            />,
+            items: recipes.map(({ recipe, count }) => ({
+              label: formatRecipe(recipe),
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForRecipe(recipe),
+            })),
+          };
+          case 'films': return {
+            heading: appText.category.filmPlural,
+            accessory: <IconFilm size={14} />,
+            items: films.map(({ film, count }) => ({
+              label: labelForFilm(film).medium,
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForFilm(film),
+            })),
+          };
+          case 'focal-lengths': return {
+            heading: appText.category.focalLengthPlural,
+            accessory: <IconFocalLength className="text-[14px]" />,
+            items: focalLengths.map(({ focal, count }) => ({
+              label: formatFocalLength(focal),
+              annotation: formatCount(count),
+              annotationAria: formatCountDescriptive(count),
+              path: pathForFocalLength(focal),
+            })),
+          };
         }
       })
       .filter(Boolean) as CommandKSection[]
@@ -461,6 +479,7 @@ export default function CommandKClient({
     years,
     cameras,
     lenses,
+    albums,
     tags,
     recipes,
     films,
@@ -640,16 +659,19 @@ export default function CommandKClient({
       });
     }
     adminSection.items.push({
-      label: selectedPhotoIds === undefined
-        ? appText.admin.batchEdit
-        : appText.admin.batchExitEdit,
+      label: isSelectingPhotos
+        ? appText.admin.selectPhotosExit
+        : appText.admin.selectPhotos,
       annotation: <IconLock narrow />,
-      path: selectedPhotoIds === undefined
-        ? PATH_GRID_INFERRED
-        : undefined,
-      action: selectedPhotoIds === undefined
-        ? () => setSelectedPhotoIds?.([])
-        : () => setSelectedPhotoIds?.(undefined),
+      // Search by legacy label
+      keywords: ['batch', 'edit'],
+      action: () => {
+        if (!isSelectingPhotos) {
+          startSelectingPhotos?.();
+        } else {
+          stopSelectingPhotos?.();
+        }
+      },
     }, {
       label: <span className="flex items-center gap-3">
         {appText.admin.appInsights}
@@ -742,12 +764,11 @@ export default function CommandKClient({
             ? <span className="translate-y-[2px]">
               <Spinner size={16} className="-mr-1" />
             </span>
-            : <span className="max-sm:hidden">
+            : <span>
               <LoaderButton
                 className={clsx(
-                  'h-auto! py-1 -mr-2',
-                  'border-medium shadow-none',
-                  queryLiveRaw ? 'px-1' : 'px-1.5',
+                  'h-auto! py-1 mr-[-9px]',
+                  'px-1',
                   'text-[12px]',
                   'text-gray-400/90 dark:text-gray-700',
                 )}
@@ -762,7 +783,14 @@ export default function CommandKClient({
               >
                 {queryLiveRaw
                   ? <IoClose size={17} className="text-dim" />
-                  : 'ESC'}
+                  : <>
+                    <span className="sm:hidden">
+                      <IoClose size={17} className="text-dim" />
+                    </span>
+                    <span className="max-sm:hidden mx-0.5">
+                      ESC
+                    </span>
+                  </>}
               </LoaderButton>
             </span>}
         </div>
