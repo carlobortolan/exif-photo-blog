@@ -85,9 +85,9 @@ export const TEXT: I18N = {
   },
   tooltip: {
     '35mm': '35mm Äquivalent',
-    zoom: 'Hineinzoomen',
-    recipeInfo: 'Rezeptinfo',
-    recipeCopy: 'Rezepttext kopieren',
+    zoom: 'Vergrößern',
+    recipeInfo: 'Filmsimulation',
+    recipeCopy: 'Rezept kopieren',
     download: 'Ursprüngliche Datei herunterladen',
     sharePhoto: 'Foto teilen',
     shareCopy: 'Link kopieren',
