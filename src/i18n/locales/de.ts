@@ -50,13 +50,13 @@ export const TEXT: I18N = {
     grid: 'Rasteransicht',
     admin: 'Admin',
     search: 'Suche',
-    prev: 'Vorherige',
-    prevShort: 'Vor',
-    next: 'Nächste',
+    prev: 'Vorheriges Bild',
+    prevShort: 'Zurück',
+    next: 'Nächstes Bild',
     nextShort: 'Weiter',
   },
   footer: {
-    madeWith: 'Hergestellt mit',
+    madeWith: 'Made with',
   },
   sort: {
     sort: 'Sortieren',
@@ -78,7 +78,7 @@ export const TEXT: I18N = {
     clearSort: 'Sortierung zurücksetzen',
   },
   cmdk: {
-    placeholder: 'Fotos, Ansichten, Einstellungen suchen ...',
+    placeholder: 'Fotos, Tags, Ausstattung, etc. suchen ...',
     searching: 'Suche ...',
     noResults: 'Keine Ergebnisse gefunden',
     pages: 'Seiten',
@@ -156,4 +156,8 @@ export const TEXT: I18N = {
     paginate: '{{index}} von {{count}}',
     paginateAction: '{{action}} {{index}} von {{count}}',
   },
+  notFound: {
+    message: "konnte nicht gefunden werden",
+    returnHome: "Zurück zur Startseite",
+  }
 };
