@@ -142,7 +142,7 @@ export const TEXT: I18N = {
     setupIncomplete: 'Setup abschließen',
     setupSignIn: 'Melde dich an, um Fotos hochzuladen',
     setupFirstPhoto: 'Füge dein erstes Foto hinzu',
-    setupConfig: 'Ändere den Seitennamen und andere Konfigurationen, indem du die Umgebungsvariablen bearbeiten, die in',
+    setupConfig: 'Ändere den Seitennamen und andere Konfigurationen, indem du die Umgebungsvariablen bearbeitest, die in',
   },
   utility: {
     more: 'Mehr',
@@ -156,8 +156,9 @@ export const TEXT: I18N = {
     paginate: '{{index}} von {{count}}',
     paginateAction: '{{action}} {{index}} von {{count}}',
   },
-  notFound: {
-    message: "konnte nicht gefunden werden",
+  pages: {
+    notFound: "{{pageName}} konnte nicht gefunden werden",
     returnHome: "Zurück zur Startseite",
+    somethingWentWrong: "Etwas ist schiefgelaufen",
   }
 };
