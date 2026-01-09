@@ -99,8 +99,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={clsx(
-        // Center on large screens
-        '3xl:flex flex-col items-center',
+        '3xl:flex flex-col',
       )}>
         <AppStateProvider areAdminDebugToolsEnabled={ADMIN_DEBUG_TOOLS_ENABLED}>
           <AppTextProvider>
